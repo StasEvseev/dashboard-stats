@@ -13,14 +13,29 @@ Vue.use(BootstrapVue);
 Vue.use(VueRouter);
 
 Vue.filter('formatDate', function(value) {
-  if (value) {
-    return moment(String(value)).format('DD.MM.YYYY hh:mm:ss')
-  }
+    if (value) {
+        return moment(String(value)).format('DD.MM.YYYY hh:mm:ss')
+    }
 });
 
 const routes = [
-  { path: '/login', component: LoginApp },
-  { path: '/', component: Dashboard }
+    {
+        path: '/login',
+        component: LoginApp
+    },
+    {
+        path: '/',
+        component: Dashboard,
+        beforeEnter: (to, from, next) => {
+            if (localStorage.user) {
+                this.user = JSON.parse(localStorage.user);
+                next();
+            } else {
+                this.$router.push('/login');
+            }
+
+        }
+    }
 ];
 
 const router = new VueRouter({

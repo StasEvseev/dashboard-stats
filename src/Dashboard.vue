@@ -3,10 +3,10 @@
         <b-row align-v="center">
             <b-col>
                 <b-container>
-                    <b-row>
+                    <b-row class="stats-title">
                         <b-col>Партнеры</b-col>
                     </b-row>
-                    <b-row>
+                    <b-row class="stats">
                         <b-col><span v-bind:class="[
                         { below: expectedPartners > partners, above: partners > expectedPartners }
                         ]">{{partners}}</span> / {{expectedPartners}}</b-col>
@@ -15,10 +15,10 @@
             </b-col>
             <b-col>
                 <b-container>
-                    <b-row>
+                    <b-row class="stats-title">
                         <b-col>Пользователи</b-col>
                     </b-row>
-                    <b-row>
+                    <b-row class="stats">
                         <b-col><span v-bind:class="[
                         { below: expectedUsers > users, above: users > expectedUsers }
                         ]">{{users}}</span> / {{expectedUsers}} </b-col>
@@ -29,10 +29,10 @@
         <b-row align-v="center">
             <b-col>
                 <b-container>
-                    <b-row>
+                    <b-row class="stats-title">
                         <b-col>Бронирования</b-col>
                     </b-row>
-                    <b-row>
+                    <b-row class="stats">
                         <b-col><span v-bind:class="[
                         { below: expectedBookings > bookings, above: bookings > expectedBookings }
                         ]">{{bookings}}</span> / {{expectedBookings}}</b-col>
@@ -41,10 +41,10 @@
             </b-col>
             <b-col>
                 <b-container>
-                    <b-row>
+                    <b-row class="stats-title">
                         <b-col>Отзывов</b-col>
                     </b-row>
-                    <b-row>
+                    <b-row class="stats">
                         <b-col><span v-bind:class="[
                         { below: expectedNotes > notes, above: notes > expectedNotes }
                         ]">{{notes}}</span> / {{expectedNotes}}</b-col>
@@ -57,7 +57,7 @@
             <b-col></b-col>
             <b-col>
                 <b-container>
-                    <b-row>
+                    <b-row class="stats-title">
                         <b-col>На период</b-col>
                     </b-row>
                     <b-row>
@@ -103,6 +103,9 @@
                   </div>
             </b-col>
         </b-row>
+        <b-row>
+            <b-col align-self="start">&nbsp;</b-col>
+        </b-row>
         <b-row  v-for="index in rounds">
             <b-col>
                 <img class="small-icon" v-bind:class="[
@@ -114,87 +117,104 @@
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        timer: null,
-        totalTime: (1 * 15),
-        resetButton: false,
-        partners: 0,
-        expectedPartners: 40,
-        users: 0,
-        expectedUsers: 10000,
-        bookings: 0,
-        expectedBookings: 10000,
-        notes: 0,
-        expectedNotes: 10000,
-        rounds: [],
-      }
-    },
-    methods: {
-      startTimer: function() {
-          this.timer = setInterval(() => this.countdown(), 1000);
-          this.resetButton = true;
-        },
-        stopTimer: function() {
-            clearInterval(this.timer);
-            this.timer = null;
-            this.resetButton = true;
-        },
-        resetTimer: function() {
-            this.totalTime = (1 * 15);
-            this.resetStats();
-        },
-        resetStats: function() {
-            this.partners = 0;
-            this.users = 0;
-            this.bookings = 0;
-            this.notes = 0;
-        },
-        rnd: function(min,max){
-            return Math.floor(Math.random()*(max-min+1)+min );
-        },
-        updateStats: function() {
-          this.partners += this.rnd(1, 10);
-          this.users += this.rnd(1, 1800);
-          this.bookings += this.rnd(1, 1800);
-          this.notes += this.rnd(1, 1800);
-        },
-        updateRound: function() {
-          let success = false;
-          if (this.partners >= this.expectedPartners && this.bookings >= this.expectedBookings && this.notes >= this.expectedNotes && this.users >= this.expectedUsers) {
-              success = true
-          }
-          this.rounds.push({success: success, date: new Date()})
-        },
-        padTime: function(time) {
-            return (time < 10 ? '0' : '') + time;
-        },
-        countdown: function() {
-            if(this.totalTime >= 1){
-                this.totalTime--;
-                this.updateStats();
-            } else{
-                this.totalTime = 0;
-                this.updateRound();
-                this.resetTimer();
+    export default {
+        data() {
+            return {
+                timer: null,
+                totalTime: (1 * 15),
+                resetButton: false,
+                partners: 0,
+                expectedPartners: 40,
+                users: 0,
+                expectedUsers: 10000,
+                bookings: 0,
+                expectedBookings: 10000,
+                notes: 0,
+                expectedNotes: 10000,
+                rounds: [],
             }
+        },
+        mounted() {
+            if (localStorage.user) {
+                this.user = JSON.parse(localStorage.user);
+            }
+            if (this.user.identities.includes('view_dashboard')) {
+                console.log('TESTTEST!!!')
+            }
+        },
+        methods: {
+            startTimer: function () {
+                this.timer = setInterval(() => this.countdown(), 1000);
+                this.resetButton = true;
+            },
+            stopTimer: function () {
+                clearInterval(this.timer);
+                this.timer = null;
+                this.resetButton = true;
+            },
+            resetTimer: function () {
+                this.totalTime = (1 * 15);
+                this.resetStats();
+            },
+            resetStats: function () {
+                this.partners = 0;
+                this.users = 0;
+                this.bookings = 0;
+                this.notes = 0;
+            },
+            rnd: function (min, max) {
+                return Math.floor(Math.random() * (max - min + 1) + min);
+            },
+            updateStats: function () {
+                this.partners += this.rnd(1, 10);
+                this.users += this.rnd(1, 1800);
+                this.bookings += this.rnd(1, 1800);
+                this.notes += this.rnd(1, 1800);
+            },
+            updateRound: function () {
+                let success = false;
+                if (this.partners >= this.expectedPartners && this.bookings >= this.expectedBookings && this.notes >= this.expectedNotes && this.users >= this.expectedUsers) {
+                    success = true
+                }
+                this.rounds.push({success: success, date: new Date()})
+            },
+            padTime: function (time) {
+                return (time < 10 ? '0' : '') + time;
+            },
+            countdown: function () {
+                if (this.totalTime >= 1) {
+                    this.totalTime--;
+                    this.updateStats();
+                } else {
+                    this.totalTime = 0;
+                    this.updateRound();
+                    this.resetTimer();
+                }
+            }
+        },
+        computed: {
+            minutes: function () {
+                const minutes = Math.floor(this.totalTime / 60);
+                return this.padTime(minutes);
+            },
+            seconds: function () {
+                const seconds = this.totalTime - (this.minutes * 60);
+                return this.padTime(seconds);
+            },
         }
-    },
-    computed: {
-        minutes: function() {
-            const minutes = Math.floor(this.totalTime / 60);
-            return this.padTime(minutes);
-        },
-        seconds: function() {
-            const seconds = this.totalTime - (this.minutes * 60);
-            return this.padTime(seconds);
-        },
     }
-  }
 </script>
 
 <style>
+
+    .stats {
+        font-size: 50px;
+    }
+
+    .stats-title {
+        font-size: 25px;
+        font-weight: bold;
+    }
 
     img.small-icon {
         width: 35px;

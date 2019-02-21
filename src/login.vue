@@ -4,7 +4,7 @@
       <b-col></b-col>
       <b-col>
 
-        <b-form @submit="onSubmit" v-if="show">
+        <b-form @submit="onSubmit">
 
           <b-form-group id="exampleInputGroup2" label="Ваше имя:" label-for="exampleInput2">
             <b-form-input
@@ -24,20 +24,26 @@
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        form: {
-          name: '',
+    export default {
+        data() {
+            return {
+                form: {
+                    name: '',
+                },
+                map: {
+                    admin: {name: 'Админ Админович', identities: ['edit_dashboard', 'view_dashboard']},
+                    user: {name: 'Обычный пользователь', identities: ['view_dashboard']},
+                },
+            }
         },
-          show: true
-      }
-    },
-    methods: {
-      onSubmit(evt) {
-        evt.preventDefault();
-        this.router.push('/');
-      }
+        methods: {
+            onSubmit(evt) {
+                evt.preventDefault();
+                if(this.map.hasOwnProperty(this.form.name)){
+                    localStorage.user = JSON.stringify(this.map[this.form.name]);
+                    this.$router.push('/');
+                }
+            }
+        }
     }
-  }
 </script>
