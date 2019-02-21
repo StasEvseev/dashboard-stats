@@ -7,15 +7,6 @@
         <b-nav-item><router-link to="/">Go to Dashboard</router-link></b-nav-item>
       </b-nav>
     </b-navbar>
-    <p>
-      <!-- use router-link component for navigation. -->
-      <!-- specify the link by passing the `to` prop. -->
-      <!-- `<router-link>` will be rendered as an `<a>` tag by default -->
-      <!--<router-link to="/login">Go to Login</router-link>-->
-      <!--<router-link to="/">Go to Dashboard</router-link>-->
-    </p>
-    <!-- route outlet -->
-    <!-- component matched by the route will render here -->
     <b-container class="bv-example-row">
       <b-row>
         <b-col><router-view></router-view></b-col>

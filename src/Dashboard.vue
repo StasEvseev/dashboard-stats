@@ -85,22 +85,29 @@
                         <i class="far fa-play-circle"></i>
                     </button>
                     <!--     Pause Timer -->
-                        <button
-                          id="stop"
-                          class="button is-dark is-large"
-                          v-if="timer"
-                          @click="stopTimer">
-                            <i class="far fa-pause-circle"></i>
-                        </button>
+                    <button
+                      id="stop"
+                      class="button is-dark is-large"
+                      v-if="timer"
+                      @click="stopTimer">
+                        <i class="far fa-pause-circle"></i>
+                    </button>
                     <!--     Restart Timer -->
-                        <button
-                          id="reset"
-                          class="button is-dark is-large"
-                          v-if="resetButton"
-                          @click="resetTimer">
-                            <i class="fas fa-undo"></i>
-                        </button>
-                      </div>
+                    <button
+                      id="reset"
+                      class="button is-dark is-large"
+                      v-if="resetButton"
+                      @click="resetTimer">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                  </div>
+            </b-col>
+        </b-row>
+        <b-row  v-for="index in rounds">
+            <b-col>
+                <img class="small-icon" v-bind:class="[
+                { bad: !index['success']}
+                ]" src="./assets/256x256bb.jpg"><span>{{index['date'] | formatDate}}</span>
             </b-col>
         </b-row>
     </b-container>
@@ -113,7 +120,6 @@
         timer: null,
         totalTime: (1 * 15),
         resetButton: false,
-        isAboveActive: true,
         partners: 0,
         expectedPartners: 40,
         users: 0,
@@ -122,6 +128,7 @@
         expectedBookings: 10000,
         notes: 0,
         expectedNotes: 10000,
+        rounds: [],
       }
     },
     methods: {
@@ -149,9 +156,16 @@
         },
         updateStats: function() {
           this.partners += this.rnd(1, 10);
-          this.users += this.rnd(1, 1300);
-          this.bookings += this.rnd(1, 1300);
-          this.notes += this.rnd(1, 1300);
+          this.users += this.rnd(1, 1800);
+          this.bookings += this.rnd(1, 1800);
+          this.notes += this.rnd(1, 1800);
+        },
+        updateRound: function() {
+          let success = false;
+          if (this.partners >= this.expectedPartners && this.bookings >= this.expectedBookings && this.notes >= this.expectedNotes && this.users >= this.expectedUsers) {
+              success = true
+          }
+          this.rounds.push({success: success, date: new Date()})
         },
         padTime: function(time) {
             return (time < 10 ? '0' : '') + time;
@@ -162,8 +176,8 @@
                 this.updateStats();
             } else{
                 this.totalTime = 0;
+                this.updateRound();
                 this.resetTimer();
-                this.resetStats();
             }
         }
     },
@@ -181,6 +195,15 @@
 </script>
 
 <style>
+
+    img.small-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    img.small-icon.bad {
+        opacity: 0.3;
+    }
 
     .panel {
         padding-top: 50px;
@@ -202,9 +225,10 @@
         color: blue;
     }
 
-#timer {
-  font-size: 40px;
-  line-height: 1;
-  margin-bottom: 40px;
-}
+    #timer {
+      font-size: 40px;
+      line-height: 1;
+      margin-bottom: 40px;
+    }
+
 </style>
