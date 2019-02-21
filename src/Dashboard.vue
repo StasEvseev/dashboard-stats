@@ -1,5 +1,16 @@
 <template>
     <b-container class="bv-example-row bv-example-row-flex-cols panel">
+        <b-modal
+                id="modalPrevent"
+                v-model="showModal"
+                ref="modal"
+                title="Новое значение"
+                @ok="handleOk"
+        >
+            <form @submit.stop.prevent="handleSubmit">
+                <b-form-input type="text" placeholder="" v-model="modalPlaceholder"/>
+            </form>
+        </b-modal>
         <b-row align-v="center">
             <b-col>
                 <b-container>
@@ -7,9 +18,19 @@
                         <b-col>Партнеры</b-col>
                     </b-row>
                     <b-row class="stats">
-                        <b-col><span v-bind:class="[
-                        { below: expectedPartners > partners, above: partners > expectedPartners }
-                        ]">{{partners}}</span> / {{expectedPartners}}</b-col>
+                        <b-col>
+                            <span v-bind:class="[
+                                { below: expectedPartners > partners, above: partners > expectedPartners }
+                                ]">{{partners}}
+                            </span> / {{expectedPartners}}
+                            <b-button
+                                id="edit"
+                                class="button is-dark"
+                                v-if="canEdit"
+                                @click="openModal('expectedPartners')">
+                                <i class="fas fa-edit"></i>
+                            </b-button>
+                        </b-col>
                     </b-row>
                 </b-container>
             </b-col>
@@ -21,7 +42,15 @@
                     <b-row class="stats">
                         <b-col><span v-bind:class="[
                         { below: expectedUsers > users, above: users > expectedUsers }
-                        ]">{{users}}</span> / {{expectedUsers}} </b-col>
+                        ]">{{users}}</span> / {{expectedUsers}}
+                        <b-button
+                                id="edit"
+                                class="button is-dark"
+                                v-if="canEdit"
+                                @click="openModal('expectedUsers')">
+                                <i class="fas fa-edit"></i>
+                            </b-button>
+                        </b-col>
                     </b-row>
                 </b-container>
             </b-col>
@@ -35,7 +64,15 @@
                     <b-row class="stats">
                         <b-col><span v-bind:class="[
                         { below: expectedBookings > bookings, above: bookings > expectedBookings }
-                        ]">{{bookings}}</span> / {{expectedBookings}}</b-col>
+                        ]">{{bookings}}</span> / {{expectedBookings}}
+                            <b-button
+                                id="edit"
+                                class="button is-dark"
+                                v-if="canEdit"
+                                @click="openModal('expectedBookings')">
+                                <i class="fas fa-edit"></i>
+                            </b-button>
+                        </b-col>
                     </b-row>
                 </b-container>
             </b-col>
@@ -47,7 +84,15 @@
                     <b-row class="stats">
                         <b-col><span v-bind:class="[
                         { below: expectedNotes > notes, above: notes > expectedNotes }
-                        ]">{{notes}}</span> / {{expectedNotes}}</b-col>
+                        ]">{{notes}}</span> / {{expectedNotes}}
+                        <b-button
+                                id="edit"
+                                class="button is-dark"
+                                v-if="canEdit"
+                                @click="openModal('expectedNotes')">
+                                <i class="fas fa-edit"></i>
+                            </b-button>
+                        </b-col>
                     </b-row>
                 </b-container>
             </b-col>
@@ -132,14 +177,36 @@
                 notes: 0,
                 expectedNotes: 10000,
                 rounds: [],
+                canEdit: false,
+
+                editableparam: undefined,
+                showModal: false,
+                modalPlaceholder: '',
             }
         },
         mounted() {
             if (localStorage.user) {
                 this.user = JSON.parse(localStorage.user);
             }
-            if (this.user.identities.includes('view_dashboard')) {
-                console.log('TESTTEST!!!')
+
+            if (localStorage.expectedPartners) {
+                this.expectedPartners = localStorage.expectedPartners;
+            }
+
+            if (localStorage.expectedUsers) {
+                this.expectedUsers = localStorage.expectedUsers;
+            }
+
+            if (localStorage.expectedBookings) {
+                this.expectedBookings = localStorage.expectedBookings;
+            }
+
+            if (localStorage.expectedNotes) {
+                this.expectedNotes = localStorage.expectedNotes;
+            }
+
+            if (this.user.identities.includes('edit_dashboard')) {
+                this.canEdit = true;
             }
         },
         methods: {
@@ -190,6 +257,28 @@
                     this.updateRound();
                     this.resetTimer();
                 }
+            },
+
+            openModal: function(type) {
+                this.showModal = true;
+                this.editableparam = type;
+                this.modalPlaceholder =  this[this.editableparam];
+            },
+            handleOk: function(event) {
+                event.preventDefault();
+                if (!this.modalPlaceholder) {
+                  alert('Please enter your name')
+                } else {
+                  this.handleSubmit();
+                }
+            },
+            handleSubmit() {
+                this[this.editableparam] = this.modalPlaceholder;
+                localStorage[this.editableparam] = this.modalPlaceholder;
+                this.$nextTick(() => {
+                  // Wrapped in $nextTick to ensure DOM is rendered before closing
+                  this.$refs.modal.hide()
+                })
             }
         },
         computed: {
