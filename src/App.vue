@@ -6,16 +6,10 @@
 
       <b-collapse is-nav id="nav_collapse">
 
-
-        <!--<b-navbar-nav>-->
-        <!--<b-nav-item active><router-link tag="li" to="/login">Go to Login</router-link></b-nav-item>-->
-        <!--<b-nav-item><router-link tag="li" to="/">Go to Dashboard</router-link></b-nav-item>-->
-        <!--</b-navbar-nav>-->
-
         <b-navbar-nav class="ml-auto">
-          <b-nav-item-dropdown right>
+          <b-nav-item-dropdown right v-if="instance.user.name !== 'Аноним'">
             <!-- Using button-content slot -->
-            <template slot="button-content"><em>{{user.name}}</em></template>
+            <template slot="button-content"><em>{{instance.user.name}}</em></template>
             <b-dropdown-item href="#" @click="signout">Выйти</b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
@@ -38,17 +32,17 @@ export default {
     name: 'app',
     data() {
         return {
-            user: {name: 'Аноним', identities: []},
+            instance: this.instanceA,
         }
     },
-    mounted() {
-        if (localStorage.user) {
-            this.user = JSON.parse(localStorage.user);
-        }
-    },
+    props: ['instanceA'],
     methods: {
         signout: function () {
             delete localStorage.user;
+            this.instance.user = {
+              name: 'Аноним',
+              identities: []
+            };
             this.$router.push('/login');
         }
     }

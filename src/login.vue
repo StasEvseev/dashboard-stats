@@ -36,13 +36,16 @@
                     user: {name: 'Обычный пользователь', identities: ['view_dashboard']},
                 },
                 is_valid: true,
+                instance: this.instanceA,
             }
         },
+        props: ['instanceA'],
         methods: {
             onSubmit(evt) {
                 evt.preventDefault();
                 if(this.map.hasOwnProperty(this.form.name)){
-                    localStorage.user = JSON.stringify(this.map[this.form.name]);
+                    this.instance.user = this.map[this.form.name];
+                    localStorage.user = JSON.stringify(this.instance.user);
                     this.$router.push('/');
                 } else {
                     this.is_valid = false;

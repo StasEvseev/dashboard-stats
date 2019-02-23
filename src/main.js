@@ -8,6 +8,15 @@ import moment from 'moment'
 import App from './App.vue'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
+import persistentState from 'vue-persistent-state';
+
+let initialState = {
+  user: {
+      name: 'Аноним',
+      identities: []
+  }  // will get value from localStorage if found there
+};
+Vue.use(persistentState, initialState);
 
 Vue.use(BootstrapVue);
 Vue.use(VueRouter);
@@ -18,20 +27,26 @@ Vue.filter('formatDate', function(value) {
     }
 });
 
+let instance = {user: {
+  name: 'Аноним',
+  identities: []
+}};
+
 const routes = [
     {
         path: '/login',
-        component: LoginApp
+        component: LoginApp,
+        props: {instanceA: instance},
     },
     {
         path: '/',
         component: Dashboard,
         beforeEnter: (to, from, next) => {
-            if (localStorage.user) {
+            if (localStorage.user && JSON.parse(localStorage.user)['identities'].includes('view_dashboard')) {
                 this.user = JSON.parse(localStorage.user);
                 next();
             } else {
-                this.$router.push('/login');
+                next('/login');
             }
 
         }
@@ -45,5 +60,11 @@ const router = new VueRouter({
 new Vue({
   el: '#app',
   router,
-  render: h => h(App)
+    render(createElement) {
+    return createElement(App, {
+      props: {
+        instanceA: instance
+      }
+    })
+  }
 });

@@ -209,6 +209,7 @@
                 this.canEdit = true;
             }
         },
+        // props: ['instance'],
         methods: {
             startTimer: function () {
                 this.timer = setInterval(() => this.countdown(), 1000);
